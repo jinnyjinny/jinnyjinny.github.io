@@ -6,7 +6,11 @@ tags: [Deep learning, Object detection]
 comments: true
 ---
 
-# [Object detector] R-CNN/Fast R-CNN/Faster R-CNN/SSD 가볍게 알아보기
+# [Object detection] R-CNN/Fast R-CNN/Faster R-CNN/SSD 
+
+전문은 https://seongkyun.github.io/papers/2019/01/06/Object_detection/ 을 가져왔다. 초반에 공부하기 매우 좋은 게시글이며, 해당 저자의 블로그에 들어가보면 더 풍부한 내용을 얻을 수 있다.
+
+---
 
 객체 탐지(Object detection)에 대해 공부하면서 정리해놓았던 내용들을 업로드 해 보았다.
 
@@ -275,6 +279,11 @@ comments: true
 <img src="/assets/post_img/papers/2019-01-06-Object_detection/fig19.png" alt="views">
 </figure>
 </center>
+
+---
+- [원문 출처]
+
+https://seongkyun.github.io/papers/2019/01/06/Object_detection/
 
 
 ---

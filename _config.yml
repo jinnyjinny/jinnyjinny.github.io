@@ -40,14 +40,14 @@ nav:
   Categories:
     - '/'
     # - { Categories All: '/blog/categories/' } #sample
-    
-    - { others: '/blog/categories/#others' }
+
+    - { TIL(Today I Learned): '/blog/categories/#TIL' }
+    - { papers: '/blog/categories/#papers' }
     - { study: '/blog/categories/#study' }
     - { baekjoon: '/blog/categories/#baekjoon' }
-    - { papers: '/blog/categories/#papers' }
-    - { git: '/blog/categories/#git' }
-    - { data_structure: '/blog/categories/#data structure' }
     - { algorithm: '/blog/categories/#algorithm' }
+    - { git: '/blog/categories/#git' }
+    - { others: '/blog/categories/#others' }
     - { Tags: '/blog/tags/' }
   About:
     - '/about/'
