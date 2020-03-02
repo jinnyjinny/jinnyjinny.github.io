@@ -44,8 +44,8 @@ nav:
     - { papers: '/blog/categories/#papers' }
     - { study: '/blog/categories/#study' }
     - { baekjoon: '/blog/categories/#baekjoon' }
-    - { algorithm: '/blog/categories/#algorithm' }
-    - { git: '/blog/categories/#git' }
+    #- { algorithm: '/blog/categories/#algorithm' }
+    #- { git: '/blog/categories/#git' }
     - { others: '/blog/categories/#others' }
     - { Tags: '/blog/tags/' }
   About:
