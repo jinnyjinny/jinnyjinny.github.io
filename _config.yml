@@ -42,7 +42,7 @@ nav:
     # - { Categories All: '/blog/categories/' } 
     - { TIL (Today I Learned): '/blog/categories/#til' }
     - { papers: '/blog/categories/#papers' }
-    - { study: '/blog/categories/#study' }
+    - { deep learning: '/blog/categories/#deep learning' }
     - { baekjoon: '/blog/categories/#baekjoon' }
     #- { algorithm: '/blog/categories/#algorithm' }
     #- { git: '/blog/categories/#git' }
