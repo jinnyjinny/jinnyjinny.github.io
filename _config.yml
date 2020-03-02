@@ -1,7 +1,7 @@
 # Site Info
 title: "Hyojin Kim's blog"
 tagline: "Hyojin Kim's blog"
-description: "공부했던 것들을 기록하는 블로그"
+description: "딥러닝과 알고리즘을 공부하며 배운 점을 기록하는 공간입니다."
 baseurl: ""
 url: https://jinnyjinny.github.io
 logo: '/public/logo.png'
@@ -29,7 +29,7 @@ author:
   contact:
     # linkedin:  https://www.linkedin.com/in/myname
     github:    https://github.com/jinnyjinny
-    #facebook:  https://www.facebook.com/seongkyun.han
+    # facebook:  https://www.facebook.com/seongkyun.han
     # twitter:   https://twitter.com/myname
     email:    hyojin.kim2238@gmail.com
 
@@ -39,9 +39,8 @@ nav:
     - '/blog/'
   Categories:
     - '/'
-    # - { Categories All: '/blog/categories/' } #sample
-
-    - { TIL(Today I Learned): '/blog/categories/#TIL' }
+    # - { Categories All: '/blog/categories/' } 
+    - { TIL (Today I Learned): '/blog/categories/#til' }
     - { papers: '/blog/categories/#papers' }
     - { study: '/blog/categories/#study' }
     - { baekjoon: '/blog/categories/#baekjoon' }
