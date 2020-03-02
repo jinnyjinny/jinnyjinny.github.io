@@ -1,0 +1,70 @@
+# Site Info
+title: "Hyojin Kim's blog"
+tagline: "Hyojin Kim's blog"
+description: "공부했던 것들을 기록하는 블로그"
+baseurl: ""
+url: https://jinnyjinny.github.io
+logo: '/public/logo.png'
+
+# Site configurations
+gems:
+  - jekyll-paginate
+markdown: kramdown
+kramdown:
+  input: GFM
+excerpt_separator: "<!-- more -->"
+sass:
+  style: compressed
+  sass_dir: _scss
+paginate: 5
+paginate_path: '/blog/page:num'
+permalink: pretty
+
+version: 1.0.0
+
+# About/contact
+author:
+  name: HYOJIN KIM
+  description: 김효진(HYOJIN KIM)
+  contact:
+    # linkedin:  https://www.linkedin.com/in/myname
+    github:    https://github.com/jinnyjinny
+    #facebook:  https://www.facebook.com/seongkyun.han
+    # twitter:   https://twitter.com/myname
+    email:    hyojin.kim2238@gmail.com
+
+# Navigation (2nd level links supported)
+nav:
+  Home:
+    - '/blog/'
+  Categories:
+    - '/'
+    # - { Categories All: '/blog/categories/' } #sample
+    
+    - { others: '/blog/categories/#others' }
+    - { study: '/blog/categories/#study' }
+    - { baekjoon: '/blog/categories/#baekjoon' }
+    - { papers: '/blog/categories/#papers' }
+    - { git: '/blog/categories/#git' }
+    - { data_structure: '/blog/categories/#data structure' }
+    - { algorithm: '/blog/categories/#algorithm' }
+    - { Tags: '/blog/tags/' }
+  About:
+    - '/about/'
+  Search:
+    - '/search/'
+
+# Where are tags and categories displayed
+tag_page: '/blog/tags/'
+category_page: '/blog/categories/'
+
+
+# Puglins
+mathjax: true # whether support mathjax
+#google_analytics_token: 'token_number' # leave blank if you don't want google analytics
+disqus_short_name: 'jinnyjinny-github-io' # leave blank if you don't want disqus
+
+
+# Use the following plug-ins
+gems:
+  - jekyll-paginate
