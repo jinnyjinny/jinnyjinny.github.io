@@ -2,7 +2,7 @@
 layout: post
 title: R-CNN/Fast R-CNN/Faster R-CNN/SSD 가볍게 알아보기
 category: papers
-tags: [Deep learning, Object detection]
+tags: [Deep learning, Object detection, R-CNN]
 comments: true
 ---
 
