@@ -15,7 +15,7 @@ comments: true
 ## Introduction
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig1.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig1.PNG" alt="views">
 <figcaption>Object detection</figcaption>
 </figure>
 </center>
@@ -26,7 +26,7 @@ comments: true
 ## R-CNN
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig2.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detectionn/fig2.PNG" alt="views">
 <figcaption>R-CNN의 구조</figcaption>
 </figure>
 </center>
@@ -44,7 +44,7 @@ comments: true
 ## Fast R-CNN
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig3.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig3.PNG" alt="views">
 <figcaption>상: R-CNN의 구조, 하: Fast R-CNN 구조</figcaption>
 </figure>
 </center>
@@ -54,7 +54,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig4.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig4.PNG" alt="views">
 <figcaption>Fast R-CNN 구조</figcaption>
 </figure>
 </center>
@@ -76,7 +76,7 @@ comments: true
 ## Faster R-CNN
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig5.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig5.PNG" alt="views">
 <figcaption>상: R-CNN 구조, 하: Faster R-CNN 구조</figcaption>
 </figure>
 </center>
@@ -85,7 +85,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig6.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig6.PNG" alt="views">
 </figure>
 </center>
 
@@ -96,13 +96,13 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig7.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig7.PNG" alt="views">
 <figcaption>R-CNN 계열 구조 비교</figcaption>
 </figure>
 </center>
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig7-1.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig7-1.PNG" alt="views">
 <figcaption>R-CNN 계열 성능 비교</figcaption>
 </figure>
 </center>
@@ -110,14 +110,14 @@ comments: true
 ## Single Shot Multi-box Detector (SSD)
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig8.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig8.PNG" alt="views">
 <figcaption>R-CNN과 SSD방식 구조 비교</figcaption>
 </figure>
 </center>
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig9.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig9.PNG" alt="views">
 <figcaption>SSD의 추론 방식</figcaption>
 </figure>
 </center>
@@ -128,7 +128,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig10.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig10.PNG" alt="views">
 <figcaption>SSD 구조</figcaption>
 </figure>
 </center>
@@ -145,7 +145,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig11.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig11.PNG" alt="views">
 </figure>
 </center>
 
@@ -156,7 +156,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig12.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig12.PNG" alt="views">
 <figcaption>IoU(Jaccard overlap)</figcaption>
 </figure>
 </center>
@@ -174,7 +174,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig13.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig13.PNG" alt="views">
 <figcaption>Positive/Negative 비율</figcaption>
 </figure>
 </center>
@@ -188,7 +188,7 @@ comments: true
 - $$L_{loc}(x, l, g)=\sum^N_{i\in{Pos}}\sum_{m\in{\left\{ cx, cy, w, h \right\}}} x^k_{ij}smooth_{L1}(l^m_i-\hat{g}^m_j)$$
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/temp1.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/temp1.PNG" alt="views">
 </figure>
 </center>
 
@@ -207,7 +207,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig13-1.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig13-1.PNG" alt="views">
 <figcaption>Flowchart</figcaption>
 </figure>
 </center>
@@ -218,7 +218,7 @@ comments: true
   - 원래는 Conv 9_2 : 5*5*(`6`*(Classes+4)) = 150*(Classes+4)이나, 예시를 위해 `3`으로 함
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig14.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig14.PNG" alt="views">
 <figcaption>SSD example</figcaption>
 </figure>
 </center>
@@ -228,7 +228,7 @@ comments: true
 
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig15.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig15.PNG" alt="views">
 </figure>
 </center>
 
@@ -252,14 +252,14 @@ comments: true
 - Mean Average Precision of PASCAL VOC 2007
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig16.png" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig16.png" alt="views">
 </figure>
 </center>
 
 - Mean Average Precision of PASCAL VOC 2012
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig17.png" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig17.png" alt="views">
 </figure>
 </center>
 
@@ -267,14 +267,14 @@ comments: true
   - Non-maximum suppression 알고리즘에 대한 효율성 개선의 여지가 남아있음
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig18.png" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig18.png" alt="views">
 </figure>
 </center>
 
 - Visualization
 <center>
 <figure>
-<img src="/assets/post_img/papers/2019-01-06-Object_detection/fig19.png" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig19.png" alt="views">
 </figure>
 </center>
 
