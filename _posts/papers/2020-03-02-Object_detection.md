@@ -26,7 +26,7 @@ comments: true
 ## R-CNN
 <center>
 <figure>
-<img src="/assets/post_img/papers/2020-03-02-Object_detectionn/fig2.PNG" alt="views">
+<img src="/assets/post_img/papers/2020-03-02-Object_detection/fig2.PNG" alt="views">
 <figcaption>R-CNN의 구조</figcaption>
 </figure>
 </center>
