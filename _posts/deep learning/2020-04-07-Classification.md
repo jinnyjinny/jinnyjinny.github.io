@@ -1,6 +1,6 @@
 ---
 layout: post
-title: K-fold 개념과 Stratified cross validation 적용해보기
+title: Image Classification 실습해보기 (AlexNet으로 개vs고양이 분류)
 category: deep learning
 tags: [classification, alexnet, tensorflow]
 comments: true
