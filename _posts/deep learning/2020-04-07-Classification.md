@@ -7,13 +7,14 @@ comments: true
 
 ---
 
-### 이미지 인식 문제를 위한 딥러닝의 기본 요소
+## 이미지 인식 문제를 위한 딥러닝의 기본 요소
 - 데이터셋
 - 성능 평가
 - (딥)러닝 모델
 - (딥)러닝 알고리즘
 
 그러면 지금부터, 위에서 언급한 딥러닝의 4가지 기본 요소를 기준으로 삼아, ‘개vs고양이 분류’ 문제 해결을 위해 직접 제작한 AlexNet 구현체를 소개해 드리도록 하겠습니다.
+<br/>
 
 ## (1) 데이터셋: Asirra Dogs vs. Cats dataset
 
@@ -202,6 +203,8 @@ next_batch 함수에서는 데이터 증강을 수행하도록 설정되어 있�
 
 또, AlexNet 논문에서는 여기에 PCA에 기반한 색상 증강(color augmentation)을 추가로 수행하였는데, 본 구현체에서는 구현의 단순화를 위해 이를 반영하지 않았습니다.
 
+<br/>
+
 ## (2) 성능 평가: 정확도
 개vs고양이 분류 문제의 성능 평가 척도로는, 가장 단순한 척도인 정확도(accuracy)를 사용합니다. 단일 사물 분류 문제의 경우 주어진 이미지를 하나의 클래스로 분류하기만 하면 되기 때문에, 정확도가 가장 직관적인 척도라고 할 수 있습니다. 이는, 테스트를 위해 주어진 전체 이미지 수 대비, 분류 모델이 올바르게 분류한 이미지 수로 정의됩니다.
 
@@ -295,13 +298,430 @@ class AccuracyEvaluator(Evaluator):
 ```
 AccuracyEvaluator 클래스는 정확도를 평가 척도로 삼는 evaluator로, Evaluator 클래스를 구현(implement)한 것입니다. score 함수에서 정확도를 계산하기 위해, scikit-learn 라이브러리에서 제공하는 sklearn.metrics.accuracy_score 함수를 불러와 사용하였습니다. 한편 is_better 함수에서는 두 성능 간의 단순 비교를 수행하는 것이 아니라, 상대적 문턱값(relative threshold)을 사용하여 현재 평가 성능이 최고 평가 성능보다 지정한 비율 이상으로 높은 경우에 한해 True를 반환하도록 하였습니다.
 
+<br/>
+
 ## (3) 러닝 모델: AlexNet
 러닝 모델로는 앞서 언급한 대로 컨볼루션 신경망인 AlexNet을 사용합니다. 이 때, 러닝 모델을 사후적으로 수정하거나 혹은 새로운 구조의 러닝 모델을 추가하는 상황에서의 편의를 고려하여, 컨볼루션 신경망에서 주로 사용하는 층(layers)들을 생성하는 함수를 미리 정의해 놓고, 일반적인 컨볼루션 신경망 모델을 표현하는 베이스 클래스를 먼저 정의한 뒤 이를 AlexNet의 클래스가 상속받는 형태로 구현하였습니다.
 
 ## models.layers 모듈
 models.layers 모듈에서는, 컨볼루션 신경망에서 주로 사용하는 컨볼루션 층(convolutional layer), 완전 연결 층(fully-connected layer) 등을 함수 형태로 정의하였습니다.
 
--- 이어서 계속 -- 
+```python
+def weight_variable(shape, stddev=0.01):
+    """
+    새로운 가중치 변수를 주어진 shape에 맞게 선언하고,
+    Normal(0.0, stddev^2)의 정규분포로부터의 샘플링을 통해 초기화함.
+    :param shape: list(int).
+    :param stddev: float, 샘플링 대상이 되는 정규분포의 표준편차 값.
+    :return weights: tf.Variable.
+    """
+    weights = tf.get_variable('weights', shape, tf.float32,
+                              tf.random_normal_initializer(mean=0.0, stddev=stddev))
+    return weights
+
+
+def bias_variable(shape, value=1.0):
+    """
+    새로운 바이어스 변수를 주어진 shape에 맞게 선언하고, 
+    주어진 상수값으로 추기화함.
+    :param shape: list(int).
+    :param value: float, 바이어스의 초기화 값.
+    :return biases: tf.Variable.
+    """
+    biases = tf.get_variable('biases', shape, tf.float32,
+                             tf.constant_initializer(value=value))
+    return biases
+
+
+def conv2d(x, W, stride, padding='SAME'):
+    """
+    주어진 입력값과 필터 가중치 간의 2D 컨볼루션을 수행함.
+    :param x: tf.Tensor, shape: (N, H, W, C).
+    :param W: tf.Tensor, shape: (fh, fw, ic, oc).
+    :param stride: int, 필터의 각 방향으로의 이동 간격.
+    :param padding: str, 'SAME' 또는 'VALID',
+                         컨볼루션 연산 시 입력값에 대해 적용할 패딩 알고리즘.
+    :return: tf.Tensor.
+    """
+    return tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding=padding)
+
+
+def max_pool(x, side_l, stride, padding='SAME'):
+    """
+    주어진 입력값에 대해 최댓값 풀링(max pooling)을 수행함.
+    :param x: tf.Tensor, shape: (N, H, W, C).
+    :param side_l: int, 풀링 윈도우의 한 변의 길이.
+    :param stride: int, 풀링 윈도우의 각 방향으로의 이동 간격. 
+    :param padding: str, 'SAME' 또는 'VALID',
+                         풀링 연산 시 입력값에 대해 적용할 패딩 알고리즘.
+    :return: tf.Tensor.
+    """
+    return tf.nn.max_pool(x, ksize=[1, side_l, side_l, 1],
+                          strides=[1, stride, stride, 1], padding=padding)
+
+
+def conv_layer(x, side_l, stride, out_depth, padding='SAME', **kwargs):
+    """
+    새로운 컨볼루션 층을 추가함.
+    :param x: tf.Tensor, shape: (N, H, W, C).
+    :param side_l: int, 필터의 한 변의 길이.
+    :param stride: int, 필터의 각 방향으로의 이동 간격.
+    :param out_depth: int, 입력값에 적용할 필터의 총 개수.
+    :param padding: str, 'SAME' 또는 'VALID',
+                         컨볼루션 연산 시 입력값에 대해 적용할 패딩 알고리즘.
+    :param kwargs: dict, 추가 인자, 가중치/바이어스 초기화를 위한 하이퍼파라미터들을 포함함.
+        - weight_stddev: float, 샘플링 대상이 되는 정규분포의 표준편차 값.
+        - biases_value: float, 바이어스의 초기화 값.
+    :return: tf.Tensor.
+    """
+    weights_stddev = kwargs.pop('weights_stddev', 0.01)
+    biases_value = kwargs.pop('biases_value', 0.1)
+    in_depth = int(x.get_shape()[-1])
+
+    filters = weight_variable([side_l, side_l, in_depth, out_depth], stddev=weights_stddev)
+    biases = bias_variable([out_depth], value=biases_value)
+    return conv2d(x, filters, stride, padding=padding) + biases
+
+
+def fc_layer(x, out_dim, **kwargs):
+    """
+    새로운 완전 연결 층을 추가함.
+    :param x: tf.Tensor, shape: (N, D).
+    :param out_dim: int, 출력 벡터의 차원수.
+    :param kwargs: dict, 추가 인자, 가중치/바이어스 초기화를 위한 하이퍼파라미터들을 포함함. 
+        - weight_stddev: float, 샘플링 대상이 되는 정규분포의 표준편차 값.
+        - biases_value: float, 바이어스의 초기화 값.
+    :return: tf.Tensor.
+    """
+    weights_stddev = kwargs.pop('weights_stddev', 0.01)
+    biases_value = kwargs.pop('biases_value', 0.1)
+    in_dim = int(x.get_shape()[-1])
+
+    weights = weight_variable([in_dim, out_dim], stddev=weights_stddev)
+    biases = bias_variable([out_dim], value=biases_value)
+    return tf.matmul(x, weights) + biases
+
+```
+AlexNet의 경우 처음 가중치(weight)와 바이어스(bias)를 초기화(initialize)할 때 각기 다른 방법으로 합니다.
+
+- 가중치: 지정한 표준편차(standard deviation)를 가지는 정규 분포(Normal distribution)으로부터 가중치들을 랜덤하게 샘플링하여 초기화함
+- 바이어스: 지정한 값으로 초기화함
+
+이를 반영하고자 weight_variable 함수에서는 가중치를 샘플링할 정규 분포의 표준편차인 stddev을, bias_variable 함수에서는 바이어스를 초기화할 값인 value를 인자로 추가하였습니다. AlexNet의 각 층에 따라 초기화에 사용할 가중치의 표준편차 및 바이어스 값 등이 다르게 적용되기 때문에, 이를 조정할 수 있도록 구현하였습니다.
+
+### models.nn 모듈
+models.nn 모듈은, 컨볼루션 신경망을 표현하는 클래스를 담고 있습니다.
+
+#### ConvNet 클래스
+```python
+class ConvNet(object):
+    """컨볼루션 신경망 모델의 베이스 클래스."""
+
+    def __init__(self, input_shape, num_classes, **kwargs):
+        """
+        모델 생성자.
+        :param input_shape: tuple, shape (H, W, C) 및 값 범위 [0.0, 1.0]의 입력값.
+        :param num_classes: int, 총 클래스 개수.
+        """
+        self.X = tf.placeholder(tf.float32, [None] + input_shape)
+        self.y = tf.placeholder(tf.float32, [None] + [num_classes])
+        self.is_train = tf.placeholder(tf.bool)
+
+        # 모델과 손실 함수 정의
+        self.d = self._build_model(**kwargs)
+        self.logits = self.d['logits']
+        self.pred = self.d['pred']
+        self.loss = self._build_loss(**kwargs)
+
+    @abstractmethod
+    def _build_model(self, **kwargs):
+        """
+        모델 생성.
+        해당 함수를 추후 구현해야 함. 
+        """
+        pass
+
+    @abstractmethod
+    def _build_loss(self, **kwargs):
+        """
+        모델 학습을 위한 손실 함수 생성.
+        해당 함수를 추후 구현해야 함. 
+        """
+        pass
+
+    def predict(self, sess, dataset, verbose=False, **kwargs):
+        """
+        주어진 데이터셋에 대한 예측을 수행함.
+        :param sess: tf.Session.
+        :param dataset: DataSet.
+        :param verbose: bool, 예측 과정에서 구체적인 정보를 출력할지 여부.
+        :param kwargs: dict, 예측을 위한 추가 인자.
+            - batch_size: int, 각 반복 회차에서의 미니배치 크기.
+            - augment_pred: bool, 예측 과정에서 데이터 증강을 수행할지 여부.
+        :return _y_pred: np.ndarray, shape: (N, num_classes).
+        """
+        batch_size = kwargs.pop('batch_size', 256)
+        augment_pred = kwargs.pop('augment_pred', True)
+
+        if dataset.labels is not None:
+            assert len(dataset.labels.shape) > 1, 'Labels must be one-hot encoded.'
+        num_classes = int(self.y.get_shape()[-1])
+        pred_size = dataset.num_examples
+        num_steps = pred_size // batch_size
+
+        if verbose:
+            print('Running prediction loop...')
+
+        # 예측 루프를 시작함
+        _y_pred = []
+        start_time = time.time()
+        for i in range(num_steps+1):
+            if i == num_steps:
+                _batch_size = pred_size - num_steps*batch_size
+            else:
+                _batch_size = batch_size
+            X, _ = dataset.next_batch(_batch_size, shuffle=False,
+                                      augment=augment_pred, is_train=False)
+            # if augment_pred == True:  X.shape: (N, 10, h, w, C)
+            # else:                     X.shape: (N, h, w, C)
+
+            # 예측 과정에서 데이터 증강을 수행할 경우,
+            if augment_pred:
+                y_pred_patches = np.empty((_batch_size, 10, num_classes),
+                                          dtype=np.float32)    # (N, 10, num_classes)
+                # 10종류의 patch 각각에 대하여 예측 결과를 산출하고,
+                for idx in range(10):
+                    y_pred_patch = sess.run(self.pred,
+                                            feed_dict={self.X: X[:, idx],    # (N, h, w, C)
+                                                       self.is_train: False})
+                    y_pred_patches[:, idx] = y_pred_patch
+                # 이들 10개 예측 결과의 평균을 산출함
+                y_pred = y_pred_patches.mean(axis=1)    # (N, num_classes)
+            else:
+                # 예측 결과를 단순 산출함
+                y_pred = sess.run(self.pred,
+                                  feed_dict={self.X: X,
+                                             self.is_train: False})    # (N, num_classes)
+
+            _y_pred.append(y_pred)
+        if verbose:
+            print('Total evaluation time(sec): {}'.format(time.time() - start_time))
+
+        _y_pred = np.concatenate(_y_pred, axis=0)    # (N, num_classes)
+
+        return _y_pred
+
+```
+ConvNet 클래스는, 컨볼루션 신경망 모델 객체를 서술하는 베이스 클래스입니다. 어떤 컨볼루션 신경망을 사용할 것이냐에 따라 그 아키텍처(architecture)가 달라질 것이기 때문에, ConvNet 클래스의 자식 클래스에서 이를 _build_model 함수에서 구현하도록 하였습니다. 한편 컨볼루션 신경망을 학습할 시 사용할 손실 함수(loss function) 또한 ConvNet의 자식 클래스에서 _build_loss 함수에 구현하도록 하였습니다.
+
+predict 함수는, DataSet 객체인 dataset을 입력받아 이에 대한 모델의 예측 결과를 반환합니다. 이 때, 테스트 단계에서의 데이터 증강 방법을 채택할 경우(augment_pred == True), 앞서 설명했던 방식대로 하나의 이미지 당 총 10개의 패치를 얻으며, 이들 각각에 대한 예측 결과를 계산하고 이들의 평균을 계산하는 방식으로 최종적인 예측을 수행하게 됩니다.
+
+#### AlexNet 클래스
+```python
+class AlexNet(ConvNet):
+    """AlexNet 클래스."""
+
+    def _build_model(self, **kwargs):
+        """
+        모델 생성.
+        :param kwargs: dict, AlexNet 생성을 위한 추가 인자.
+            - image_mean: np.ndarray, 평균 이미지: 이미지들의 각 입력 채널별 평균값, shape: (C,).
+            - dropout_prob: float, 완전 연결 층에서 각 유닛별 드롭아웃 수행 확률.
+        :return d: dict, 각 층에서의 출력값들을 포함함.
+        """
+        d = dict()    # 각 중간층에서의 출력값을 포함하는 dict.
+        X_mean = kwargs.pop('image_mean', 0.0)
+        dropout_prob = kwargs.pop('dropout_prob', 0.0)
+        num_classes = int(self.y.get_shape()[-1])
+
+        # Dropout을 적용할 층들에서의 각 유닛별 '유지' 확률
+        keep_prob = tf.cond(self.is_train,
+                            lambda: 1. - dropout_prob,
+                            lambda: 1.)
+
+        # input
+        X_input = self.X - X_mean    # 기존 입력값으로부터 평균 이미지를 뺌
+
+        # conv1 - relu1 - pool1
+        with tf.variable_scope('conv1'):
+            d['conv1'] = conv_layer(X_input, 11, 4, 96, padding='VALID',
+                                    weights_stddev=0.01, biases_value=0.0)
+            print('conv1.shape', d['conv1'].get_shape().as_list())
+        d['relu1'] = tf.nn.relu(d['conv1'])
+        # (227, 227, 3) --> (55, 55, 96)
+        d['pool1'] = max_pool(d['relu1'], 3, 2, padding='VALID')
+        # (55, 55, 96) --> (27, 27, 96)
+        print('pool1.shape', d['pool1'].get_shape().as_list())
+
+        # conv2 - relu2 - pool2
+        with tf.variable_scope('conv2'):
+            d['conv2'] = conv_layer(d['pool1'], 5, 1, 256, padding='SAME',
+                                    weights_stddev=0.01, biases_value=0.1)
+            print('conv2.shape', d['conv2'].get_shape().as_list())
+        d['relu2'] = tf.nn.relu(d['conv2'])
+        # (27, 27, 96) --> (27, 27, 256)
+        d['pool2'] = max_pool(d['relu2'], 3, 2, padding='VALID')
+        # (27, 27, 256) --> (13, 13, 256)
+        print('pool2.shape', d['pool2'].get_shape().as_list())
+
+        # conv3 - relu3
+        with tf.variable_scope('conv3'):
+            d['conv3'] = conv_layer(d['pool2'], 3, 1, 384, padding='SAME',
+                                    weights_stddev=0.01, biases_value=0.0)
+            print('conv3.shape', d['conv3'].get_shape().as_list())
+        d['relu3'] = tf.nn.relu(d['conv3'])
+        # (13, 13, 256) --> (13, 13, 384)
+
+        # conv4 - relu4
+        with tf.variable_scope('conv4'):
+            d['conv4'] = conv_layer(d['relu3'], 3, 1, 384, padding='SAME',
+                                    weights_stddev=0.01, biases_value=0.1)
+            print('conv4.shape', d['conv4'].get_shape().as_list())
+        d['relu4'] = tf.nn.relu(d['conv4'])
+        # (13, 13, 384) --> (13, 13, 384)
+
+        # conv5 - relu5 - pool5
+        with tf.variable_scope('conv5'):
+            d['conv5'] = conv_layer(d['relu4'], 3, 1, 256, padding='SAME',
+                                    weights_stddev=0.01, biases_value=0.1)
+            print('conv5.shape', d['conv5'].get_shape().as_list())
+        d['relu5'] = tf.nn.relu(d['conv5'])
+        # (13, 13, 384) --> (13, 13, 256)
+        d['pool5'] = max_pool(d['relu5'], 3, 2, padding='VALID')
+        # (13, 13, 256) --> (6, 6, 256)
+        print('pool5.shape', d['pool5'].get_shape().as_list())
+
+        # 전체 feature maps를 flatten하여 벡터화
+        f_dim = int(np.prod(d['pool5'].get_shape()[1:]))
+        f_emb = tf.reshape(d['pool5'], [-1, f_dim])
+        # (6, 6, 256) --> (9216)
+
+        # fc6
+        with tf.variable_scope('fc6'):
+            d['fc6'] = fc_layer(f_emb, 4096,
+                                weights_stddev=0.005, biases_value=0.1)
+        d['relu6'] = tf.nn.relu(d['fc6'])
+        d['drop6'] = tf.nn.dropout(d['relu6'], keep_prob)
+        # (9216) --> (4096)
+        print('drop6.shape', d['drop6'].get_shape().as_list())
+
+        # fc7
+        with tf.variable_scope('fc7'):
+            d['fc7'] = fc_layer(d['drop6'], 4096,
+                                weights_stddev=0.005, biases_value=0.1)
+        d['relu7'] = tf.nn.relu(d['fc7'])
+        d['drop7'] = tf.nn.dropout(d['relu7'], keep_prob)
+        # (4096) --> (4096)
+        print('drop7.shape', d['drop7'].get_shape().as_list())
+
+        # fc8
+        with tf.variable_scope('fc8'):
+            d['logits'] = fc_layer(d['relu7'], num_classes,
+                                weights_stddev=0.01, biases_value=0.0)
+        # (4096) --> (num_classes)
+
+        # softmax
+        d['pred'] = tf.nn.softmax(d['logits'])
+
+        return d
+
+    def _build_loss(self, **kwargs):
+        """
+        모델 학습을 위한 손실 함수 생성.
+        :param kwargs: dict, 정규화 항을 위한 추가 인자.
+            - weight_decay: float, L2 정규화 계수.
+        :return tf.Tensor.
+        """
+        weight_decay = kwargs.pop('weight_decay', 0.0005)
+        variables = tf.trainable_variables()
+        l2_reg_loss = tf.add_n([tf.nn.l2_loss(var) for var in variables])
+
+        # 소프트맥스 교차 엔트로피 손실 함수
+        softmax_losses = tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits)
+        softmax_loss = tf.reduce_mean(softmax_losses)
+
+        return softmax_loss + weight_decay*l2_reg_loss
+```
+<br/>
+
+
+## 학습 수행 및 테스트 결과
+train.py 스크립트에서는 실제 학습을 수행하는 과정을 구현하였으며, test.py 스크립트에서는 테스트 데이터셋에 대하여 학습이 완료된 모델을 테스트하는 과정을 구현하였습니다.
+
+### train.py 스크립트
+```python
+""" 1. 원본 데이터셋을 메모리에 로드하고 분리함 """
+root_dir = os.path.join('/', 'mnt', 'sdb2', 'Datasets', 'asirra')    # FIXME
+trainval_dir = os.path.join(root_dir, 'train')
+
+# 원본 학습+검증 데이터셋을 로드하고, 이를 학습 데이터셋과 검증 데이터셋으로 나눔
+X_trainval, y_trainval = dataset.read_asirra_subset(trainval_dir, one_hot=True)
+trainval_size = X_trainval.shape[0]
+val_size = int(trainval_size * 0.2)    # FIXME
+val_set = dataset.DataSet(X_trainval[:val_size], y_trainval[:val_size])
+train_set = dataset.DataSet(X_trainval[val_size:], y_trainval[val_size:])
+
+# 중간 점검
+print('Training set stats:')
+print(train_set.images.shape)
+print(train_set.images.min(), train_set.images.max())
+print((train_set.labels[:, 1] == 0).sum(), (train_set.labels[:, 1] == 1).sum())
+print('Validation set stats:')
+print(val_set.images.shape)
+print(val_set.images.min(), val_set.images.max())
+print((val_set.labels[:, 1] == 0).sum(), (val_set.labels[:, 1] == 1).sum())
+
+
+""" 2. 학습 수행 및 성능 평가를 위한 하이퍼파라미터 설정 """
+hp_d = dict()
+image_mean = train_set.images.mean(axis=(0, 1, 2))    # 평균 이미지
+np.save('/tmp/asirra_mean.npy', image_mean)    # 평균 이미지를 저장
+hp_d['image_mean'] = image_mean
+
+# FIXME: 학습 관련 하이퍼파라미터
+hp_d['batch_size'] = 256
+hp_d['num_epochs'] = 300
+
+hp_d['augment_train'] = True
+hp_d['augment_pred'] = True
+
+hp_d['init_learning_rate'] = 0.01
+hp_d['momentum'] = 0.9
+hp_d['learning_rate_patience'] = 30
+hp_d['learning_rate_decay'] = 0.1
+hp_d['eps'] = 1e-8
+
+# FIXME: 정규화 관련 하이퍼파라미터
+hp_d['weight_decay'] = 0.0005
+hp_d['dropout_prob'] = 0.5
+
+# FIXME: 성능 평가 관련 하이퍼파라미터
+hp_d['score_threshold'] = 1e-4
+
+
+""" 3. Graph 생성, session 초기화 및 학습 시작 """
+# 초기화
+graph = tf.get_default_graph()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+
+model = ConvNet([227, 227, 3], 2, **hp_d)
+evaluator = Evaluator()
+optimizer = Optimizer(model, train_set, evaluator, val_set=val_set, **hp_d)
+
+sess = tf.Session(graph=graph, config=config)
+train_results = optimizer.train(sess, details=True, verbose=True, **hp_d)
+```
+
+<br/>
+
+
+
 
 ## Reference
 [1] 이미지 Classification 문제와 딥러닝: AlexNet으로 개vs고양이 분류하기 [[url]](http://research.sualab.com/practice/2018/01/17/image-classification-deep-learning.html) <br/>
+
+```python
+```
+
+<br/>
